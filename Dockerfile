@@ -1,7 +1,7 @@
 # 多阶段构建 Dockerfile for Tron Address Generator
 
 # 第一阶段：构建阶段
-FROM rust:1.92-slim as builder
+FROM rust:1.83-slim as builder
 
 # 设置工作目录
 WORKDIR /app
