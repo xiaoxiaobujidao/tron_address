@@ -203,29 +203,3 @@ docker run -v $(pwd)/output:/app/output \
 ```bash
 echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 ```
-
-## 📄 许可证
-
-本项目使用 MIT 许可证。
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## ⚡ 更新日志
-
-### v0.1.0
-- 初始版本
-- 支持多核并行生成
-- 支持自定义相同字符数量
-- Docker 支持
-- GitHub Actions 自动构建
-
-## 📞 联系方式
-
-如有问题或建议，请提交 [Issue](../../issues)。
-
----
-
-**注意**: 本工具仅供学习和研究使用，请遵守当地法律法规。生成的地址和私钥的安全性由用户自行负责。
-
