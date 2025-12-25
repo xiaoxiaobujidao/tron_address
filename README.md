@@ -23,7 +23,7 @@ docker pull ghcr.io/xiaoxiaobujidao/tron_address:latest
 
 ### 基本使用
 
-生成末尾至少 6 个相同字符的地址：
+使用默认参数生成地址（最小重复字符数为8，默认输出到tron_address.txt）：
 
 ```bash
 docker run -v $(pwd)/output:/app/output ghcr.io/xiaoxiaobujidao/tron_address:latest
@@ -31,13 +31,13 @@ docker run -v $(pwd)/output:/app/output ghcr.io/xiaoxiaobujidao/tron_address:lat
 
 ### 自定义参数
 
-指定末尾至少 8 个相同字符：
+指定最小重复字符数为 10：
 
 ```bash
 docker run -v $(pwd)/output:/app/output \
   ghcr.io/xiaoxiaobujidao/tron_address:latest \
-  --min-same-chars 8 \
-  --output /app/output/addresses.txt
+  -c 10 \
+  -o /app/output/addresses.txt
 ```
 
 限制生成 10 个地址后停止：
@@ -45,19 +45,19 @@ docker run -v $(pwd)/output:/app/output \
 ```bash
 docker run -v $(pwd)/output:/app/output \
   ghcr.io/xiaoxiaobujidao/tron_address:latest \
-  --min-same-chars 6 \
-  --limit 10 \
-  --output /app/output/addresses.txt
+  -c 8 \
+  -l 10 \
+  -o /app/output/addresses.txt
 ```
 
-指定使用的 CPU 核心数：
+指定使用的线程数：
 
 ```bash
 docker run -v $(pwd)/output:/app/output \
   ghcr.io/xiaoxiaobujidao/tron_address:latest \
-  --min-same-chars 7 \
-  --cores 8 \
-  --output /app/output/addresses.txt
+  -c 7 \
+  -t 8 \
+  -o /app/output/addresses.txt
 ```
 
 ### 后台运行
@@ -67,8 +67,8 @@ docker run -d \
   --name tron-generator \
   -v $(pwd)/output:/app/output \
   ghcr.io/xiaoxiaobujidao/tron_address:latest \
-  --min-same-chars 7 \
-  --limit 100
+  -c 7 \
+  -l 100
 ```
 
 查看日志：
@@ -100,15 +100,15 @@ cargo build --release
 ### 运行
 
 ```bash
-# 使用默认参数（末尾至少 6 个相同字符）
+# 使用默认参数（最小重复字符数为8，默认输出到tron_address.txt）
 ./target/release/tron_address
 
 # 自定义参数
 ./target/release/tron_address \
-  --min-same-chars 7 \
-  --cores 8 \
-  --output my_addresses.txt \
-  --limit 50 \
+  -c 7 \
+  -t 8 \
+  -o my_addresses.txt \
+  -l 50 \
   --batch-size 100000
 ```
 
@@ -116,10 +116,10 @@ cargo build --release
 
 | 参数 | 短参数 | 默认值 | 说明 |
 |------|--------|--------|------|
-| `--min-same-chars` | `-m` | 6 | 末尾相同字符的最小数量 |
-| `--cores` | `-c` | CPU核心数 | 使用的 CPU 核心数 |
-| `--output` | `-o` | output | 输出文件名 |
-| `--limit` | `-l` | 0（无限制） | 生成地址数量限制 |
+| `--min-same-chars` | `-c` | 8 | 最小重复字符数 |
+| `--threads` | `-t` | CPU核心数 | 使用的线程数 |
+| `--output` | `-o` | tron_address.txt | 输出文件路径 |
+| `--limit` | `-l` | 0（无限制） | 生成数量 |
 | `--batch-size` | `-b` | 50000 | 批处理大小 |
 
 ## 📝 输出格式
@@ -166,7 +166,7 @@ cargo build --release
 可以通过环境变量设置默认值：
 
 ```bash
-# 设置默认最小相同字符数
+# 设置默认最小重复字符数
 export MIN_SAME_CHARS=7
 
 # Docker 中使用环境变量

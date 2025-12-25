@@ -4,7 +4,6 @@ use secp256k1::{PublicKey, Secp256k1, SecretKey};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use sha3::Keccak256;
-use std::env;
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -16,20 +15,20 @@ use rand::RngCore;
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// 末尾相同字符的最小数量
-    #[arg(short, long, default_value_t = get_min_same_chars_default())]
+    /// 最小重复字符数
+    #[arg(short = 'c', long, default_value_t = 8)]
     min_same_chars: usize,
 
-    /// CPU核心数
-    #[arg(short, long, default_value_t = num_cpus::get())]
-    cores: usize,
+    /// 线程数
+    #[arg(short = 't', long, default_value_t = num_cpus::get())]
+    threads: usize,
 
-    /// 输出文件名
-    #[arg(short, long, default_value = "output")]
+    /// 输出文件路径
+    #[arg(short = 'o', long, default_value = "tron_address.txt")]
     output: String,
 
-    /// 生成地址数量限制（0表示无限制）
-    #[arg(short, long, default_value_t = 0)]
+    /// 生成数量（0表示无限制）
+    #[arg(short = 'l', long, default_value_t = 0)]
     limit: u64,
 
     /// 批处理大小（更大的批次可能更快）
@@ -49,20 +48,20 @@ fn main() {
     
     println!("🚀 Tron地址生成器启动 (极速模式)");
     println!("📊 配置信息:");
-    println!("   - 最小相同字符数: {}", args.min_same_chars);
-    println!("   - CPU核心数: {}", args.cores);
+    println!("   - 最小重复字符数: {}", args.min_same_chars);
+    println!("   - 线程数: {}", args.threads);
     println!("   - 批处理大小: {}", args.batch_size);
     println!("   - 输出文件: {}", args.output);
     if args.limit > 0 {
-        println!("   - 生成限制: {} 个地址", args.limit);
+        println!("   - 生成数量: {} 个地址", args.limit);
     } else {
-        println!("   - 生成限制: 无限制");
+        println!("   - 生成数量: 无限制");
     }
     println!();
 
     // 设置线程池
     rayon::ThreadPoolBuilder::new()
-        .num_threads(args.cores)
+        .num_threads(args.threads)
         .build_global()
         .unwrap();
 
@@ -242,13 +241,6 @@ fn count_trailing_same_chars_optimized(s: &str) -> usize {
     }
     
     count
-}
-
-fn get_min_same_chars_default() -> usize {
-    env::var("MIN_SAME_CHARS")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(6)
 }
 
 fn get_repeated_char(s: &str) -> char {
