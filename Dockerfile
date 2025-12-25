@@ -28,9 +28,10 @@ RUN touch src/main.rs && \
 # 第二阶段：运行
 FROM debian:bookworm-slim
 
-# 安装运行时依赖
+# 安装运行时依赖（包含 nice 命令）
 RUN apt-get update && apt-get install -y \
     ca-certificates \
+    coreutils \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -44,8 +45,8 @@ RUN mkdir -p /app/output
 # 设置工作目录
 WORKDIR /app/output
 
-# 设置入口点
-ENTRYPOINT ["tron_address"]
+# 设置入口点，使用 nice -n 19 设置最低优先级
+ENTRYPOINT ["nice", "-n", "19", "tron_address"]
 
 # 默认参数（可以在运行时覆盖）
 CMD ["--help"]
